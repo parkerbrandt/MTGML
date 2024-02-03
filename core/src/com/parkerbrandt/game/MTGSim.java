@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.parkerbrandt.utilities.InputHandler;
@@ -22,6 +21,8 @@ import io.magicthegathering.javasdk.resource.Card;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -42,20 +43,31 @@ public class MTGSim extends ApplicationAdapter {
 	private Array<Array<String>> decklists;
 	private Array<Array<Card>> mtgDecklists;
 
+	// Game Objects
 	private InputHandler inputHandler;
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 
+	private Rectangle bucket;
+	private Array<Rectangle> cards;
+
 	// Assets
 	private Texture bucketImage;
-
-	// Game Objects
-	private Rectangle bucket;
 
 
 	/*
 	 * Methods
 	 */
+
+	/**
+	 * Returns the Magic card, given the name of the card
+	 * @param name the name of the card (i.e. "Cyclonic Rift" or "Kodama's Reach")
+	 * @return the full Card object
+	 */
+	private Card getCardByName(String name) {
+		List<Card> cards = CardAPI.getAllCards(Arrays.asList(name));
+		return cards.get(0);
+	}
 
 	/**
 	 * Finds the user's decklists in the 'files' directory, and returns them
@@ -127,8 +139,11 @@ public class MTGSim extends ApplicationAdapter {
 				cardName = cardName.replace(quantity + " ", "");
 
 				// Load the card
-				Card card = CardAPI.getCard(cardName);
-				mtgList.add(card);
+				Card card = getCardByName(cardName);
+
+				// Add the card that quantity many times
+				for (int i = 0; i < quantity; i++)
+					mtgList.add(card);
 			}
 
 			mtgDecklists.add(mtgList);
