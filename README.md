@@ -6,11 +6,14 @@ they will play the game, or if the AI agent will play the game and learn a speci
 
 While most likely not optimal, learning will be performed via deck vs. deck. For example, the agent will learn Izzet Phoenix vs. Azorius Control, but if it faces Rakdos Midrange, it will not perform and will need to relearn.
 
+Each agent will have to learn a tremendous number of states, so clustering may be used to reduce the number of states if possible.
+
 
 Planned machine learning/AI methods:
 - Q-Learning
 - TD-Learning
 - Minimax w/ Alpha-Beta Pruning
+- Clustering
 
 
 Planned features:
