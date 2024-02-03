@@ -8,9 +8,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MTGSim extends ApplicationAdapter {
+
+	/*
+	 * Class variables
+	 */
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 480;
 
 	/*
 	 * Properties
@@ -30,12 +37,19 @@ public class MTGSim extends ApplicationAdapter {
 
 
 	/*
-	 * Override Methods
+	 * Methods
 	 */
 
 
+	/*
+	 * Override Methods
+	 */
+
 	@Override
 	public void create () {
+
+		// TODO: Get all relevant Magic cards
+
 		// Load images
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
@@ -50,14 +64,14 @@ public class MTGSim extends ApplicationAdapter {
 
 		// Create the camera
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		camera.setToOrtho(false, WIDTH, HEIGHT);
 
 		// Create the sprite batch to draw the 2D images
 		batch = new SpriteBatch();
 
 		// Initialize our bucket
 		bucket = new Rectangle();
-		bucket.x = 800/2 - 64/2;
+		bucket.x = WIDTH/2 - 64/2;
 		bucket.y = 20;
 		bucket.width = 64;
 		bucket.height = 64;
@@ -76,7 +90,14 @@ public class MTGSim extends ApplicationAdapter {
 		batch.draw(bucketImage, bucket.x, bucket.y);
 		batch.end();
 
+		// TODO: Make new class for interaction
 		// Allow for mouse interaction
+		if (Gdx.input.isTouched()) {
+			Vector3 touchPos = new Vector3();
+			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+			camera.unproject(touchPos);
+			bucket.x = touchPos.x - 64 / 2;
+		}
 	}
 	
 	@Override

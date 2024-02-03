@@ -59,6 +59,7 @@ project(":core") {
 
 
     dependencies {
+        implementation 'io.magicthegathering:javasdk:0.0.18'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
