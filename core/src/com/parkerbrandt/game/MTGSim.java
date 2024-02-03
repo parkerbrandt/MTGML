@@ -110,11 +110,9 @@ public class MTGSim extends ApplicationAdapter {
 		inputHandler = new InputHandler();
 
 		// Load images
-		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
 
 		// Load sound effects and music
-		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 
 		// Start playback of background music
