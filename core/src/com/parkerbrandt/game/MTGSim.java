@@ -13,11 +13,15 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.parkerbrandt.screens.MainScreen;
+import com.parkerbrandt.screens.MatchScreen;
+import com.parkerbrandt.screens.SettingsScreen;
 import com.parkerbrandt.utilities.InputHandler;
 
 import io.magicthegathering.javasdk.api.CardAPI;
 import io.magicthegathering.javasdk.api.MTGAPI;
 import io.magicthegathering.javasdk.resource.Card;
+import jdk.tools.jmod.Main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +46,11 @@ public class MTGSim extends ApplicationAdapter {
 	 */
 	private Array<Array<String>> decklists;
 	private Array<Array<Card>> mtgDecklists;
+
+	// Screens
+	private MainScreen mainScreen;
+	private SettingsScreen settingsScreen;
+	private MatchScreen matchScreen;
 
 	// Game Objects
 	private InputHandler inputHandler;
@@ -98,6 +107,23 @@ public class MTGSim extends ApplicationAdapter {
 		}
 
 		return allLists;
+	}
+
+	/*
+	 * Screen Methods
+	 */
+	private void setMainScreen() {
+		mainScreen = new MainScreen(this);
+
+	}
+
+	private void setSettingsScreen() {
+		settingsScreen = new SettingsScreen(this);
+
+	}
+
+	private void setMatchScreen() {
+		matchScreen = new MatchScreen(this);
 	}
 
 
