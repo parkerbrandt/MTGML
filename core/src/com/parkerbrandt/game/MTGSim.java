@@ -11,9 +11,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.parkerbrandt.utilities.InputHandler;
+
+import io.magicthegathering.javasdk.api.CardAPI;
+import io.magicthegathering.javasdk.api.MTGAPI;
+import io.magicthegathering.javasdk.resource.Card;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,17 +39,15 @@ public class MTGSim extends ApplicationAdapter {
 	/*
 	 * Properties
 	 */
+	private Array<Array<String>> decklists;
+	private Array<Array<Card>> mtgDecklists;
 
 	private InputHandler inputHandler;
-
-	// Assets
-	private Texture dropImage;
-	private Texture bucketImage;
-	private Sound dropSound;
-	private Music rainMusic;
-
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
+
+	// Assets
+	private Texture bucketImage;
 
 	// Game Objects
 	private Rectangle bucket;
@@ -74,7 +77,6 @@ public class MTGSim extends ApplicationAdapter {
 
 				String line = "";
 				while ((line = reader.readLine()) != null) {
-					// TODO: Need to separate between count and card name
 					System.out.println("\tAdding " + line + " to " + file.nameWithoutExtension());
 					decklist.add(line);
 				}
@@ -94,17 +96,43 @@ public class MTGSim extends ApplicationAdapter {
 	@Override
 	public void create () {
 
+		// Set up Magic API connection timeouts
+		MTGAPI.setConnectTimeout(60);
+		MTGAPI.setReadTimeout(60);
+		MTGAPI.setWriteTimeout(60);
+
 		// TODO: Need to have user choose mode (AI or Manual)
 
 		// Retrieve the user's decklist info from the text files
 		try {
-			Array<Array<String>> decklists = getDecklists();
+			decklists = getDecklists();
 		} catch(IOException err) {
 			System.out.println("Could not read from decklists...");
 			System.out.println(err.getMessage());
 		}
 
 		// TODO: Need to have user choose from the available decklists
+
+		// Load each decklist as MTG cards from the MTG API
+		mtgDecklists = new Array<>();
+		for (Array<String> decklist : decklists) {
+			Array<Card> mtgList = new Array<>();
+
+			// Iterate through list and load cards
+			for (String cardName : decklist) {
+				// Need to separate the quantity from the actual name
+				String[] data = cardName.split(" ");
+
+				int quantity = Integer.parseInt(data[0]);
+				cardName = cardName.replace(quantity + " ", "");
+
+				// Load the card
+				Card card = CardAPI.getCard(cardName);
+				mtgList.add(card);
+			}
+
+			mtgDecklists.add(mtgList);
+		}
 
 		// Initialize the interaction handler (handles mouse and keyboard input)
 		inputHandler = new InputHandler();
@@ -113,11 +141,8 @@ public class MTGSim extends ApplicationAdapter {
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
 
 		// Load sound effects and music
-		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 
 		// Start playback of background music
-		rainMusic.setLooping(true);
-		rainMusic.play();
 
 		// Create the camera
 		camera = new OrthographicCamera();
@@ -167,10 +192,7 @@ public class MTGSim extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
-		dropImage.dispose();
 		bucketImage.dispose();
-		dropSound.dispose();
-		rainMusic.dispose();
 		batch.dispose();
 	}
 }

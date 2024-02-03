@@ -10,7 +10,7 @@ public class DesktopLauncher {
 
 		// Set window parameters
 		config.setTitle("Learning Magic: The Gathering");
-		config.setWindowedMode(800, 480);
+		config.setWindowedMode(MTGSim.WIDTH, MTGSim.HEIGHT);
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 
