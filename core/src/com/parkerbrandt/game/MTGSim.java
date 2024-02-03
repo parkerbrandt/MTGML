@@ -5,19 +5,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.parkerbrandt.utilities.InputHandler;
-import org.w3c.dom.css.Rect;
 
-import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 
 /**
@@ -49,22 +48,42 @@ public class MTGSim extends ApplicationAdapter {
 
 	// Game Objects
 	private Rectangle bucket;
-	private Array<Rectangle> raindrops;
-	private long lastDropTime;
 
 
 	/*
 	 * Methods
 	 */
 
-	private void spawnRaindrop() {
-		Rectangle raindrop = new Rectangle();
-		raindrop.x = MathUtils.random(0, WIDTH - 64);
-		raindrop.y = HEIGHT;
-		raindrop.width = 64;
-		raindrop.height = 64;
-		raindrops.add(raindrop);
-		lastDropTime = TimeUtils.nanoTime();
+	/**
+	 * Finds the user's decklists in the 'files' directory, and returns them
+	 * @return an array that contains each decklist, itself being an array of strings
+	 */
+	private Array<Array<String>> getDecklists() throws IOException {
+		Array<Array<String>> allLists = new Array<>();
+
+		// Get all the files, check if they are text files, and then retrieve the information from them
+		FileHandle[] files = Gdx.files.local("files/").list();
+		for (FileHandle file : files) {
+			Array<String> decklist = new Array<>();
+
+			if (file.extension().equalsIgnoreCase("txt")) {
+				System.out.println("Reading " + file.nameWithoutExtension() + "...");
+
+				// Read the file and retrieve the information
+				BufferedReader reader = new BufferedReader(file.reader());
+
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					// TODO: Need to separate between count and card name
+					System.out.println("\tAdding " + line + " to " + file.nameWithoutExtension());
+					decklist.add(line);
+				}
+
+				System.out.println("Finshed reading " + file.nameWithoutExtension());
+			}
+		}
+
+		return allLists;
 	}
 
 
@@ -75,7 +94,17 @@ public class MTGSim extends ApplicationAdapter {
 	@Override
 	public void create () {
 
-		// TODO: Get all relevant Magic cards
+		// TODO: Need to have user choose mode (AI or Manual)
+
+		// Retrieve the user's decklist info from the text files
+		try {
+			Array<Array<String>> decklists = getDecklists();
+		} catch(IOException err) {
+			System.out.println("Could not read from decklists...");
+			System.out.println(err.getMessage());
+		}
+
+		// TODO: Need to have user choose from the available decklists
 
 		// Initialize the interaction handler (handles mouse and keyboard input)
 		inputHandler = new InputHandler();
@@ -105,10 +134,6 @@ public class MTGSim extends ApplicationAdapter {
 		bucket.y = 20;
 		bucket.width = 64;
 		bucket.height = 64;
-
-		// Begin to create raindrops
-		raindrops = new Array<>();
-		spawnRaindrop();
 	}
 
 	@Override
@@ -122,9 +147,6 @@ public class MTGSim extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.draw(bucketImage, bucket.x, bucket.y);
-		for (Rectangle raindrop : raindrops) {
-			batch.draw(dropImage, raindrop.x, raindrop.y);
-		}
 		batch.end();
 
 		// Allow for mouse interaction
@@ -143,22 +165,6 @@ public class MTGSim extends ApplicationAdapter {
 		if (bucket.x < 0) bucket.x = 0;
 		if (bucket.x > WIDTH - 64) bucket.x = 800 -64;
 
-		// Check if we should spawn another raindrop
-		if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
-
-		// Make the raindrops move
-		for (Iterator<Rectangle> iter = raindrops.iterator(); iter.hasNext();) {
-			Rectangle raindrop = iter.next();
-			raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-
-			if (raindrop.y + 64 < 0) iter.remove();
-
-			// Check for collisions with the bucket
-			if (raindrop.overlaps(bucket)) {
-				dropSound.play();
-				iter.remove();
-			}
-		}
 	}
 	
 	@Override
