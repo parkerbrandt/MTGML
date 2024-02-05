@@ -10,6 +10,7 @@ public class MainScreen implements Screen {
      */
     private MTGSim mainClass;
 
+
     /*
      * Constructor
      */
@@ -17,6 +18,7 @@ public class MainScreen implements Screen {
         // Initialize variables
         this.mainClass = mainClass;
     }
+
 
     /*
      * Overridden Methods

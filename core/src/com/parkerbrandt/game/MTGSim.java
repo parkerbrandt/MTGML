@@ -3,6 +3,7 @@ package com.parkerbrandt.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -21,7 +22,6 @@ import com.parkerbrandt.utilities.InputHandler;
 import io.magicthegathering.javasdk.api.CardAPI;
 import io.magicthegathering.javasdk.api.MTGAPI;
 import io.magicthegathering.javasdk.resource.Card;
-import jdk.tools.jmod.Main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,6 +48,8 @@ public class MTGSim extends ApplicationAdapter {
 	private Array<Array<Card>> mtgDecklists;
 
 	// Screens
+	private Screen currentScreen;
+
 	private MainScreen mainScreen;
 	private SettingsScreen settingsScreen;
 	private MatchScreen matchScreen;
@@ -114,7 +116,7 @@ public class MTGSim extends ApplicationAdapter {
 	 */
 	private void setMainScreen() {
 		mainScreen = new MainScreen(this);
-
+		currentScreen = mainScreen;
 	}
 
 	private void setSettingsScreen() {
@@ -175,6 +177,8 @@ public class MTGSim extends ApplicationAdapter {
 			mtgDecklists.add(mtgList);
 		}
 
+		setMainScreen();
+
 		// Initialize the interaction handler (handles mouse and keyboard input)
 		inputHandler = new InputHandler();
 
@@ -229,11 +233,16 @@ public class MTGSim extends ApplicationAdapter {
 		if (bucket.x < 0) bucket.x = 0;
 		if (bucket.x > WIDTH - 64) bucket.x = 800 -64;
 
+		currentScreen.render(Gdx.graphics.getDeltaTime());
 	}
 	
 	@Override
 	public void dispose () {
 		bucketImage.dispose();
 		batch.dispose();
+
+		mainScreen.dispose();
+		settingsScreen.dispose();
+		matchScreen.dispose();
 	}
 }
